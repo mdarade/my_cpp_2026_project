@@ -49,7 +49,7 @@ docker run --rm hello-world
 ## 2. Get the code
 
 ```bash
-git clone <repo-url> my_cpp_2026_project
+git clone <[repo-url](https://github.com/mdarade/my_cpp_2026_project.git)> my_cpp_2026_project
 cd my_cpp_2026_project
 ```
 
