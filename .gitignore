@@ -1,0 +1,9 @@
+# Build output (all CMake presets)
+build/
+
+# clangd index cache
+.cache/
+
+# OS / editor noise
+.DS_Store
+*.swp

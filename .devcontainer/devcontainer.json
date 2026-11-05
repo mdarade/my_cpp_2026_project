@@ -1,0 +1,45 @@
+{
+  "name": "C++26 Clang Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  // Mount the repo at /workspace, the same path CI and `docker run -v "$PWD":/workspace`
+  // use. Debug info and compile_commands.json store absolute paths, so a build made
+  // either way must see the same path, or gdb cannot find the sources.
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+  "workspaceFolder": "/workspace",
+  "customizations": {
+    "vscode": {
+      // Extensions installed automatically inside the container
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "llvm-vs-code-extensions.vscode-clangd"
+      ],
+      "settings": {
+        // Disable default IntelliSense engine to let clangd handle modern C++ seamlessly
+        "C_Cpp.intelliSenseEngine": "disabled",
+        "clangd.path": "/usr/bin/clangd",
+        // Show clang-tidy diagnostics inline; config comes from .clang-tidy / .clangd
+        "clangd.arguments": ["--clang-tidy", "--header-insertion=never"],
+        // Use CMakePresets.json (debug / release / asan / ci)
+        "cmake.useCMakePresets": "always",
+        "cmake.configureOnOpen": true,
+        // Format with clangd using .clang-format
+        "[cpp]": {
+          "editor.defaultFormatter": "llvm-vs-code-extensions.vscode-clangd",
+          "editor.formatOnSave": true
+        }
+      }
+    }
+  },
+  // Essential flags allowing GDB/LLDB to debug processes inside the container
+  // (also needed by LeakSanitizer in the asan preset)
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined"
+  ],
+  // Optional: runs after the container builds (e.g. initial setup)
+  "postCreateCommand": "clang++ --version"
+}

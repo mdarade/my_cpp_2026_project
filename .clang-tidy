@@ -1,0 +1,20 @@
+---
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  clang-analyzer-*,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  performance-*,
+  readability-*,
+  -readability-magic-numbers,
+  -readability-identifier-length,
+  -readability-function-cognitive-complexity
+HeaderFilterRegex: '.*/(include|src|tests)/.*'
+CheckOptions:
+  # `template for` makes the compiler declare hidden variables __u0, __u1, ...;
+  # clang-tidy 23 wrongly reports them as reserved identifiers.
+  bugprone-reserved-identifier.AllowedIdentifiers: '^__u[0-9]+$'
+FormatStyle: file
+...

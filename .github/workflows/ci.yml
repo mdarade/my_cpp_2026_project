@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+
+      # Build the same image the devcontainer uses, so CI == local dev environment.
+      - name: Build dev container image
+        run: docker build -t cpp-dev .devcontainer
+
+      - name: Check formatting (clang-format)
+        run: >
+          docker run --rm -v "$PWD":/workspace -w /workspace cpp-dev
+          bash -c "find include src tests -name '*.[ch]pp' | xargs clang-format --dry-run --Werror"
+
+      - name: Build + test (ASan/UBSan, -Werror, clang-tidy)
+        run: >
+          docker run --rm --cap-add=SYS_PTRACE -v "$PWD":/workspace -w /workspace cpp-dev
+          cmake --workflow --preset ci

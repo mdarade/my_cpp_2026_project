@@ -1,0 +1,76 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 28, "patch": 0 },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "clang++",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "debug",
+      "displayName": "Debug",
+      "inherits": "base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+    },
+    {
+      "name": "release",
+      "displayName": "Release",
+      "inherits": "base",
+      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "asan",
+      "displayName": "Debug + ASan/UBSan",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CPPDEMO_ENABLE_SANITIZERS": "ON"
+      }
+    },
+    {
+      "name": "ci",
+      "displayName": "CI (ASan/UBSan + -Werror + clang-tidy)",
+      "inherits": "asan",
+      "cacheVariables": {
+        "CPPDEMO_WARNINGS_AS_ERRORS": "ON",
+        "CPPDEMO_ENABLE_CLANG_TIDY": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "debug", "configurePreset": "debug" },
+    { "name": "release", "configurePreset": "release" },
+    { "name": "asan", "configurePreset": "asan" },
+    { "name": "ci", "configurePreset": "ci" }
+  ],
+  "testPresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "output": { "outputOnFailure": true },
+      "environment": {
+        "UBSAN_OPTIONS": "print_stacktrace=1"
+      }
+    },
+    { "name": "debug", "inherits": "base", "configurePreset": "debug" },
+    { "name": "release", "inherits": "base", "configurePreset": "release" },
+    { "name": "asan", "inherits": "base", "configurePreset": "asan" },
+    { "name": "ci", "inherits": "base", "configurePreset": "ci" }
+  ],
+  "workflowPresets": [
+    {
+      "name": "ci",
+      "steps": [
+        { "type": "configure", "name": "ci" },
+        { "type": "build", "name": "ci" },
+        { "type": "test", "name": "ci" }
+      ]
+    }
+  ]
+}
